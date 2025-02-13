@@ -20,7 +20,7 @@ A AI-powered Django-based face analysis application that uses pre-trained deep l
 
 1. Clone the repository:
     ```bash
-    git clone <repository-url>
+    git clone <https://github.com/MN10101/Face_Analysis.git>
     ```
 2. Install the necessary dependencies:
     ```bash
@@ -56,6 +56,3 @@ The models used in the system are as follows:
 2. Allow camera access to capture your face.
 3. Wait for the system to analyze your face and display the results, including gender, beard presence, eye color, and skin tone.
 
-## License
-
-MIT License
