@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Analysis</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <h2>Face Analysis System</h2>
+    
+    <!-- Camera Container -->
+    <div id="video-container">
+        <video id="video" autoplay></video>
+        <div id="scanEffect" class="scan-overlay"></div>
+    </div>
+
+    <!-- Loading Animation -->
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>Analyzing your face...</p>
+    </div>
+
+    <canvas id="canvas" style="display: none;"></canvas>
+    
+    <!-- Results -->
+    <div id="results"></div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const resultsDiv = document.getElementById('results');
+        const loadingDiv = document.getElementById('loading');
+        const scanEffect = document.getElementById('scanEffect');
+
+        // Start the camera feed
+        navigator.mediaDevices.getUserMedia({
+            video: { width: 640, height: 480 }
+        })
+        .then(stream => {
+            video.srcObject = stream;
+            video.onloadedmetadata = () => {
+                video.play();
+                startFaceScan();
+            };
+        })
+        .catch(error => console.error("Camera error:", error));
+
+        function startFaceScan() {
+            scanEffect.style.display = "block"; 
+            loadingDiv.style.display = 'block'; 
+
+            setTimeout(() => {
+                captureFaceFrame();
+            }, 2000); // Wait for effect
+        }
+
+        function captureFaceFrame() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imageData = canvas.toDataURL('image/jpeg', 0.7);
+
+            fetch('/analyze/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: imageData })
+            })
+            .then(response => response.json())
+            .then(data => {
+                video.pause();
+
+                resultsDiv.innerHTML = `
+                    <h3>Analysis Results:</h3>
+                    <p><strong>Sex:</strong> ${data.sex}</p>
+                    <p><strong>Beard:</strong> ${data.beard}</p>
+                    <p><strong>Eye Color:</strong> ${data.eye_color}</p>
+                    <p><strong>Skin Tone:</strong> ${data.skin_color}</p>
+                `;
+                resultsDiv.style.display = 'block';
+                loadingDiv.style.display = 'none';
+                scanEffect.style.display = "none"; 
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
