@@ -56,3 +56,7 @@ The models used in the system are as follows:
 2. Allow camera access to capture your face.
 3. Wait for the system to analyze your face and display the results, including gender, beard presence, eye color, and skin tone.
 
+---
+
+https://github.com/user-attachments/assets/ef03c329-0b3d-4613-9ebf-540e5cf08544
+
